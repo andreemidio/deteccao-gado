@@ -1,4 +1,4 @@
-import cv2 as cv
+import cv2
 import numpy as np
 
 confThreshold = 0.5  
@@ -16,10 +16,10 @@ with open(classesFile, 'rt') as f:
 modelConfiguration = "yolov3-tiny.cfg"
 modelWeights = "yolov3-tiny.weights"
 
-net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
+net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 
-net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv.dnn.DNN_TARGET_OPENCL)
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL)
 print('Using GPU device.')
 
 def getOutputsNames(net):
@@ -29,7 +29,7 @@ def getOutputsNames(net):
     return [layersNames[i-1] for i in net.getUnconnectedOutLayers()]
 
 def drawPred(classId, conf, left, top, right, bottom):
-    cv.rectangle(frame, (left, top), (right, bottom), (255, 178, 50), 3)
+    cv2.rectangle(frame, (left, top), (right, bottom), (255, 178, 50), 3)
     
     label = '%.2f' % conf
         
@@ -37,10 +37,10 @@ def drawPred(classId, conf, left, top, right, bottom):
         assert(classId < len(classes))
         label = '%s:%s' % (classes[classId], label)
 
-    labelSize, baseLine = cv.getTextSize(label, cv.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+    labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
     top = max(top, labelSize[1])
-    cv.rectangle(frame, (left, top - round(1.5*labelSize[1])), (left + round(1.5*labelSize[0]), top + baseLine), (255, 255, 255), cv.FILLED)
-    cv.putText(frame, label, (left, top), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0,0,0), 1)
+    cv2.rectangle(frame, (left, top - round(1.5*labelSize[1])), (left + round(1.5*labelSize[0]), top + baseLine), (255, 255, 255), cv2.FILLED)
+    cv2.putText(frame, label, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0,0,0), 1)
 
 def postprocess(frame, outs):
     frameHeight = frame.shape[0]
@@ -67,7 +67,7 @@ def postprocess(frame, outs):
                 boxes.append([left, top, width, height])
 
 
-    indices = cv.dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThreshold)
+    indices = cv2.dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThreshold)
     for i in indices:
         box = boxes[i]
         left = box[0]
@@ -78,21 +78,21 @@ def postprocess(frame, outs):
 
 
 winName = 'Detecção de Gado'
-cv.namedWindow(winName, cv.WINDOW_NORMAL)
+cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
 
 
 
 print("Input video file doesn't exist")
 
-cap = cv.VideoCapture("gado.mp4")
+cap = cv2.VideoCapture("gado.mp4")
 
 
 outputFile = 'gado.mp4_yolo_novo_out_py.avi'
 
 
-vid_writer = cv.VideoWriter(outputFile, cv.VideoWriter_fourcc('M','J','P','G'), 30, (round(cap.get(cv.CAP_PROP_FRAME_WIDTH)),round(cap.get(cv.CAP_PROP_FRAME_HEIGHT))))
+vid_writer = cv2.VideoWriter(outputFile, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (round(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
 
-while True:
+while cv2.waitKey(1) < 0:
     
 
     hasFrame, frame = cap.read()
@@ -101,30 +101,24 @@ while True:
     if not hasFrame:
         print("Done processing !!!")
         print("Output file is stored as ", outputFile)
-        cv.waitKey(3000)
-        # Release device
+        cv2.waitKey(3000)
+
         cap.release()
         break
 
-    # Create a 4D blob from a frame.
-    blob = cv.dnn.blobFromImage(frame, 1/255, (inpWidth, inpHeight), [0,0,0], 1, crop=False)
+    blob = cv2.dnn.blobFromImage(frame, 1/255, (inpWidth, inpHeight), [0,0,0], 1, crop=False)
 
-    # Sets the input to the network
     net.setInput(blob)
 
-    # Runs the forward pass to get output of the output layers
     outs = net.forward(getOutputsNames(net))
 
-    # Remove the bounding boxes with low confidence
     postprocess(frame, outs)
 
-    # Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
     t, _ = net.getPerfProfile()
-    label = 'Inference time: %.2f ms' % (t * 1000.0 / cv.getTickFrequency())
-    cv.putText(frame, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+    label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
+    cv2.putText(frame, label, (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
 
-    # Write the frame with the detection boxes
 
     vid_writer.write(frame.astype(np.uint8))
 
-    cv.imshow(winName, frame)
+    cv2.imshow(winName, frame)
