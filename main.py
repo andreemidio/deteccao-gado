@@ -8,13 +8,13 @@ inpHeight = 416
 
         
 # Load names of classes
-classesFile = "coco.names"
+classesFile = "modelos/coco.names"
 classes = None
 with open(classesFile, 'rt') as f:
     classes = f.read().rstrip('\n').split('\n')
 
-modelConfiguration = "yolov3-tiny.cfg"
-modelWeights = "yolov3-tiny.weights"
+modelConfiguration = "modelos/yolov3-tiny.cfg"
+modelWeights = "modelos/yolov3-tiny.weights"
 
 net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 
