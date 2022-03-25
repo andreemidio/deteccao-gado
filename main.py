@@ -122,3 +122,6 @@ while cv2.waitKey(1) < 0:
     vid_writer.write(frame.astype(np.uint8))
 
     cv2.imshow(winName, frame)
+
+cv2.destroyAllWindows()
+exit()
