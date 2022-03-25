@@ -1,9 +1,8 @@
 
 
-teste
+Detecção de Gado
 ==============================
 
-Detecção de Gado
 
 Project Organization
 ------------
