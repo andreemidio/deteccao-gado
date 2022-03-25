@@ -20,12 +20,10 @@ Project Organization
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
     │
-    │
-    │
     ├── modelos   <- Models to use in inference predictions
     │   │                 
-    │   ├── coco.names
-    │   └── yolov3-tiny.cfg
+    │   ├── coco.names               
+    │   ├── yolov3-tiny.cfg
         └── yolov3-tiny.weights
 
 
